@@ -1,0 +1,8 @@
+{
+    "debug": true,
+    "delay": 0,
+    "headers": {
+        "User-Agent": "sitemap-health-checker"
+    },
+    "url": "https://www.gezibosphorus.com/sitemap_tr.xml"
+}
