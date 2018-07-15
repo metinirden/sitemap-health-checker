@@ -1,8 +1,10 @@
+import csv
 import argparse
 from time import sleep
 from bs4 import BeautifulSoup
 from os.path import isfile
 from config import Config
+from resp import Response
 from requests import get
 from json import loads, dumps
 
@@ -15,8 +17,6 @@ def argument_parser():
                        action='store_true', help='generate example config file.')
     parser.add_argument('--force', dest='force',
                         action='store_true', help='force operation.')
-    parser.add_argument('--output', dest='output', action='store',
-                        choices=['json', 'txt', 'excel'], help='Special testing value')
     args = parser.parse_args()
 
     if args.generate == True:
@@ -36,9 +36,15 @@ def argument_parser():
 def output(config, resps):
     if config.output == None:
         return
-    file = open(f'logs.{config.output}', 'w', encoding='utf-8')
-    file.write(dumps(resps, indent=4))
-
+    if config.output == 'json':
+        file = open(f'logs.json', 'w', encoding='utf-8')
+        serialized_resps = [resp.__dict__ for resp in resps]
+        file.write(dumps(serialized_resps, indent=4))
+    elif config.output == 'csv':
+        file = csv.writer(open('logs.csv','w', encoding='utf-8'),)
+        file.writerow(['url', 'status_code','elapsed'])
+        for resp in resps:
+            file.writerow([resp.url, resp.status_code, resp.elapsed])
 
 def process_config(config):
     resp = get(config.url)
@@ -53,7 +59,7 @@ def process_config(config):
         resp = get(url.text)
         if config.debug:
             print(url.text, resp.status_code, resp.elapsed)
-        resps.append((resp.url, resp.status_code, str(resp.elapsed)))
+        resps.append(Response(resp.url, resp.status_code, str(resp.elapsed)))
     return resps
 
 
