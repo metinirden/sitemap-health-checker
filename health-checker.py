@@ -41,10 +41,11 @@ def output(config, resps):
         serialized_resps = [resp.__dict__ for resp in resps]
         file.write(dumps(serialized_resps, indent=4))
     elif config.output == 'csv':
-        file = csv.writer(open('logs.csv','w', encoding='utf-8'),)
-        file.writerow(['url', 'status_code','elapsed'])
+        file = csv.writer(open('logs.csv', 'w', encoding='utf-8'),)
+        file.writerow(['url', 'status_code', 'elapsed'])
         for resp in resps:
             file.writerow([resp.url, resp.status_code, resp.elapsed])
+
 
 def process_config(config):
     resp = get(config.url)
@@ -57,6 +58,10 @@ def process_config(config):
         if config.delay > 0:
             sleep(config.delay)
         resp = get(url.text)
+        innerSoup = BeautifulSoup(resp.content, 'html.parser')
+        if len(innerSoup.find_all('loc')) > 0:
+            config.url = url.text
+            process_config(config)
         if config.debug:
             print(url.text, resp.status_code, resp.elapsed)
         resps.append(Response(resp.url, resp.status_code, str(resp.elapsed)))

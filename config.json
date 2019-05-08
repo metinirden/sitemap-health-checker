@@ -1,0 +1,9 @@
+{
+    "debug": true,
+    "delay": 1,
+    "headers": {
+        "User-Agent": "sitemap-health-checker"
+    },
+    "output": "json",
+    "url": "https://medium.com/sitemap/users/2019/users-2019-03-28.xml"
+}
